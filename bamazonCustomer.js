@@ -51,7 +51,9 @@ function cusReq() {
           }
     ]).then(function(ans) {
       connection.query('select stock_quantity from products where ?', {item_id: ans.id}, function(err, res) {
-        if(err) throw(err);
+        if(err){
+           throw(err);
+        };
         if (res[0].stock_quantity >= ans.amount) {
           connection.query('update products set ? where ?',
            [
@@ -63,15 +65,21 @@ function cusReq() {
              }
            ]);
           connection.query('select price from products where ?', {item_id: ans.id}, function(err, res) {
-            if(err) throw (err);
+            if(err){
+             throw (err);
+            }
             var price = res[0].price;
             var totalPrice = price * ans.amount;
             console.log("You're total comes to $" + totalPrice + '\n');
             reset();
           });
         }
-          else if (res[0].stock_quantity < ans.amount) {
+          else if (0 < res[0].stock_quantity < ans.amount ) {
             console.log('Insufficient quantity! We only have ' + res[0].stock_quantity + ' of those left!\n');
+            displayItems();
+          }
+          else {
+            console.log('We are out of stock! We will have more soon.');
             displayItems();
           }
       })
